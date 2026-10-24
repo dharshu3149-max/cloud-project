@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 20px;">
+
+    <!-- Welcome Banner -->
+    <div style="background: linear-gradient(90deg, #eff6ff 0%, #ffffff 100%); border: 1px solid #bfdbfe; border-radius: 12px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+        <div>
+            <h2 style="font-size: 18px; font-weight: 700; color: #1e3a8a; margin: 0 0 4px 0;">Hello, {{ current_user_name }}! 👋</h2>
+            <p style="font-size: 13px; color: #64748b; margin: 0;">Here's your real-time cloud backup summary and synchronization ledger.</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="{{ url_for('upload_page') }}" style="background: #2563eb; color: #ffffff; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(37,99,235,0.25);">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Upload Backup
+            </a>
+            <a href="{{ url_for('restore_page') }}" style="background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+                Restore Files
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 Key Stat Cards -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+        
+        <!-- Total Backups -->
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Total Backups</span>
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                </div>
+            </div>
+            <div style="font-size: 26px; font-weight: 800; color: #0f172a; line-height: 1.1;">{{ stats.total_backups }}</div>
+            <div style="font-size: 11.5px; color: #10b981; font-weight: 600;">+2 files backed up this week</div>
+        </div>
+
+        <!-- Total Storage Used -->
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Total Storage Used</span>
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: #dcfce7; color: #16a34a; display: flex; align-items: center; justify-content: center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+                </div>
+            </div>
+            <div style="font-size: 26px; font-weight: 800; color: #0f172a; line-height: 1.1;">{{ stats.total_size_formatted }}</div>
+            <div style="font-size: 11.5px; color: #64748b;">Across {{ stats.total_backups }} encrypted documents</div>
+        </div>
+
+        <!-- Last Backup Date -->
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Last Backup Date</span>
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: #f3e8ff; color: #9333ea; display: flex; align-items: center; justify-content: center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                </div>
+            </div>
+            <div style="font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.1; margin-top: 3px;">{{ stats.last_backup_date }}</div>
+            <div style="font-size: 11.5px; color: #64748b;">{{ stats.last_backup_sub }}</div>
+        </div>
+
+        <!-- Storage Usage Progress Bar -->
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Storage Quota</span>
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: #ccfbf1; color: #0d9488; display: flex; align-items: center; justify-content: center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <div style="font-size: 26px; font-weight: 800; color: #0f172a; line-height: 1.1;">{{ stats.storage_percent_used }}%</div>
+                <div style="font-size: 11.5px; font-weight: 600; color: #64748b;">{{ stats.used_mb }} MB / {{ stats.quota_formatted }}</div>
+            </div>
+            <div style="height: 7px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-top: 4px;">
+                <div style="height: 100%; width: {{ stats.storage_percent_used }}%; background: #10b981; border-radius: 999px;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent Backups Table Card -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); overflow: hidden;">
+        <div style="padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h3 style="font-size: 15px; font-weight: 700; color: #0f172a; margin: 0;">Recent Backups</h3>
+                <span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 999px; font-weight: 600;">Latest activity</span>
+            </div>
+            <a href="{{ url_for('files_page') }}" style="font-size: 12.5px; font-weight: 600; color: #2563eb; text-decoration: none;">View All Files →</a>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 12.5px;">
+                <thead>
+                    <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                        <th style="padding: 12px 22px; text-align: left; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">File Name</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Type</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Size</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Backup Date</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Status</th>
+                        <th style="padding: 12px 22px; text-align: right; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for backup in recent_backups %}
+                    <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 12px 22px;">
+                            <div style="display: flex; align-items: center; gap: 10px; font-weight: 600; color: #0f172a;">
+                                {% if backup.file_type == 'PDF' %}
+                                    <svg style="color: #ef4444; flex-shrink: 0;" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                                {% elif backup.file_type == 'Zip' %}
+                                    <svg style="color: #f59e0b; flex-shrink: 0;" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                                {% elif backup.file_type == 'Image' %}
+                                    <svg style="color: #8b5cf6; flex-shrink: 0;" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                                {% elif backup.file_type == 'PPT' %}
+                                    <svg style="color: #ea580c; flex-shrink: 0;" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                                {% else %}
+                                    <svg style="color: #3b82f6; flex-shrink: 0;" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                                {% endif %}
+                                <span>{{ backup.original_name }}</span>
+                            </div>
+                        </td>
+                        <td style="padding: 12px 16px; color: #475569;">{{ backup.file_type }}</td>
+                        <td style="padding: 12px 16px; color: #475569; font-weight: 500;">{{ backup.file_size_formatted }}</td>
+                        <td style="padding: 12px 16px; color: #64748b;">{{ backup.upload_time }}</td>
+                        <td style="padding: 12px 16px;">
+                            <span style="display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; color: #059669; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">
+                                <span style="width: 5px; height: 5px; background: #10b981; border-radius: 50%;"></span>
+                                Backed up
+                            </span>
+                        </td>
+                        <td style="padding: 12px 22px; text-align: right;">
+                            <div style="display: inline-flex; gap: 8px;">
+                                <a href="{{ url_for('download_file', backup_id=backup.id) }}" 
+                                   onclick="downloadBackup(event, {{ backup.id }}, '{{ backup.original_name }}')" 
+                                   download="{{ backup.original_name }}"
+                                   title="Download {{ backup.original_name }}" 
+                                   style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 10px; color: #334155; text-decoration: none; font-size: 11.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s ease;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    Download
+                                </a>
+                                <button onclick="restoreFile({{ backup.id }}, '{{ backup.original_name }}')" title="Restore File" style="background: #2563eb; border: none; border-radius: 6px; padding: 4px 10px; color: #ffffff; font-size: 11px; font-weight: 600; cursor: pointer;">
+                                    Restore
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Audit Timeline Logs -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 22px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+        <h4 style="font-size: 13.5px; font-weight: 700; color: #0f172a; margin: 0 0 14px 0;">Cloud Audit & Sync Ledger</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            {% for log in recent_logs %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #2563eb; font-size: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-weight: 700; color: #1e3a8a;">{{ log.action }}</span>
+                    <span style="color: #475569;">{{ log.details }}</span>
+                </div>
+                <span style="font-size: 11px; color: #94a3b8;">{{ log.timestamp }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

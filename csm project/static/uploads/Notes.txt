@@ -1,0 +1,34 @@
+==================================================================
+  CLOUD BACKUP TRACKER - VIVA & EXPO PRESENTATION NOTES
+==================================================================
+
+Student Name: Dharshini
+Project Title: Cloud Backup Tracker
+Discipline: Computer Science & Engineering (Third Year Mini Project)
+Tech Stack: Python Flask, SQLite3, HTML5, CSS3, JavaScript (ES6)
+
+------------------------------------------------------------------
+KEY SYSTEM MODULES:
+------------------------------------------------------------------
+1. Real-Time Dashboard:
+   - Visual statistics tracking total backups, storage usage, and last sync.
+   - Storage quota monitoring with dynamic percentage allocation.
+   - Live audit logging ledger recording all file operations.
+
+2. Secure Cloud Upload:
+   - Drag-and-drop dropzone with client and server-side validation.
+   - Multi-cloud routing simulator (AWS S3, Google Cloud, Azure Blob, Local Vault).
+   - Cryptographic SHA-256 hash calculation for file integrity.
+
+3. File Management & Download:
+   - Point-in-time recovery and secure download via Flask send_from_directory.
+   - Preserves original filename, extension, and content MIME type.
+
+4. Cloud Settings & Preferences:
+   - User account profile management.
+   - Storage tier quota upgrades (2 GB, 10 GB, 50 GB).
+   - Real-time cloud gateway ping latency diagnostics.
+
+------------------------------------------------------------------
+Status: Verified & Authenticated in Local Cloud Vault
+==================================================================

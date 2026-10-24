@@ -1,0 +1,10 @@
+Cloud Backup Tracker Local Vault
+File: video_demo_walkthrough.mp4
+Provider: Azure Blob
+Upload Timestamp: 2026-10-23 16:48:12
+Checksum: none-transfer-interrupted
+Notes: Connection timeout during multipart chunk #14 upload
+
+============================================================
+This is an authenticated backup copy stored in the Cloud Backup Vault.
+Project: College CSM Cloud Backup Tracker System.

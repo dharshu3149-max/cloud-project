@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+
+    <!-- Page Header -->
+    <div>
+        <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0;">Settings</h2>
+        <p style="font-size: 13.5px; color: #64748b; margin: 0;">Manage your account credentials, cloud storage quotas, and backup alerts.</p>
+    </div>
+
+    <!-- Section 1: Account Profile -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #e0f2fe; color: #2563eb; display: flex; align-items: center; justify-content: center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 0;">Account Information</h3>
+            </div>
+            <button onclick="openEditProfileModal()" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #334155; cursor: pointer;">
+                Edit Profile
+            </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f8fafc;">
+                <span style="color: #64748b; display: flex; align-items: center; gap: 8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/></svg>
+                    Full Name
+                </span>
+                <span id="displayUserName" style="font-weight: 600; color: #0f172a;">{{ user.name }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f8fafc;">
+                <span style="color: #64748b; display: flex; align-items: center; gap: 8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    Email Address
+                </span>
+                <span id="displayUserEmail" style="font-weight: 600; color: #0f172a;">{{ user.email }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                <span style="color: #64748b; display: flex; align-items: center; gap: 8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Password
+                </span>
+                <a href="javascript:void(0)" onclick="openChangePasswordModal()" style="color: #2563eb; font-weight: 600; text-decoration: none;">Change Password ›</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Cloud Storage -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                </div>
+                <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 0;">Cloud Storage Allocation</h3>
+            </div>
+            <button onclick="openUpgradeModal()" style="background: #2563eb; color: #ffffff; border: none; padding: 7px 16px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 6px rgba(37,99,235,0.25);">
+                Upgrade Plan
+            </button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+            <span style="color: #64748b;">Used Storage Capacity</span>
+            <span id="storageStatsText" style="font-weight: 700; color: #0f172a;">{{ stats.used_mb }} MB / {{ stats.quota_formatted }} ({{ stats.storage_percent_used }}%)</span>
+        </div>
+
+        <div style="height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden;">
+            <div id="storageProgressBar" style="height: 100%; width: {{ stats.storage_percent_used }}%; background: #10b981; border-radius: 999px; transition: width 0.3s ease;"></div>
+        </div>
+    </div>
+
+    <!-- Section 3: Notification Preferences -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #f3e8ff; color: #9333ea; display: flex; align-items: center; justify-content: center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            </div>
+            <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 0;">Notification Preferences</h3>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 13.5px; font-weight: 600; color: #0f172a;">Email notifications</div>
+                    <div style="font-size: 11.5px; color: #64748b;">Receive instant email reports when cloud backup finishes</div>
+                </div>
+                <input type="checkbox" id="notifEmail" {% if notif_prefs.email_notifications %}checked{% endif %} onchange="saveNotifications()" style="width: 18px; height: 18px; accent-color: #2563eb; cursor: pointer;">
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 13.5px; font-weight: 600; color: #0f172a;">Backup reminder (daily)</div>
+                    <div style="font-size: 11.5px; color: #64748b;">Automated daily ping reminder for un-synced project folders</div>
+                </div>
+                <input type="checkbox" id="notifReminder" {% if notif_prefs.daily_reminder %}checked{% endif %} onchange="saveNotifications()" style="width: 18px; height: 18px; accent-color: #2563eb; cursor: pointer;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 4: Diagnostics & Viva Demo Tools -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 0;">Cloud Diagnostics & Demo Tools</h3>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="runLatencyPing()" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #334155; cursor: pointer;">
+                    ⚡ Test Gateway Latency
+                </button>
+                <button onclick="resetDemoData()" style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #ef4444; cursor: pointer;">
+                    Reset Demo State
+                </button>
+            </div>
+        </div>
+
+        <div id="pingResults" style="display: none; background: #f8fafc; border-radius: 8px; padding: 12px; font-size: 12px; margin-top: 10px;">
+            <div id="pingList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal: Edit Profile -->
+<div id="editProfileModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; align-items: center; justify-content: center;">
+    <div style="background: #ffffff; border-radius: 12px; width: 400px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
+        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 16px 0;">Edit User Profile</h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Full Name</label>
+                <input type="text" id="editNameInput" value="{{ user.name }}" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+            </div>
+            <div>
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Email Address</label>
+                <input type="email" id="editEmailInput" value="{{ user.email }}" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+                <button onclick="closeModal('editProfileModal')" style="padding: 6px 14px; border: 1px solid #cbd5e1; background: #ffffff; border-radius: 6px; font-size: 12px; cursor: pointer;">Cancel</button>
+                <button onclick="saveProfile()" style="padding: 6px 16px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Change Password -->
+<div id="changePasswordModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; align-items: center; justify-content: center;">
+    <div style="background: #ffffff; border-radius: 12px; width: 400px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
+        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 16px 0;">Change Password</h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">New Password</label>
+                <input type="password" id="newPasswordInput" placeholder="At least 6 characters" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+                <button onclick="closeModal('changePasswordModal')" style="padding: 6px 14px; border: 1px solid #cbd5e1; background: #ffffff; border-radius: 6px; font-size: 12px; cursor: pointer;">Cancel</button>
+                <button onclick="savePassword()" style="padding: 6px 16px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">Update Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Upgrade Storage Quota -->
+<div id="upgradeModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; align-items: center; justify-content: center;">
+    <div style="background: #ffffff; border-radius: 12px; width: 440px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
+        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;">Upgrade Cloud Storage Quota</h3>
+        <p style="font-size: 12.5px; color: #64748b; margin: 0 0 16px 0;">Select your allocated storage tier capacity for your project:</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer;">
+                <div>
+                    <div style="font-weight: 700; font-size: 13px; color: #0f172a;">2 GB Free Tier (Current)</div>
+                    <div style="font-size: 11px; color: #64748b;">Included for college coursework</div>
+                </div>
+                <input type="radio" name="quotaOption" value="2" {% if stats.quota_gb == 2 %}checked{% endif %} style="accent-color: #2563eb;">
+            </label>
+
+            <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer;">
+                <div>
+                    <div style="font-weight: 700; font-size: 13px; color: #0f172a;">10 GB Pro Storage</div>
+                    <div style="font-size: 11px; color: #64748b;">Multi-cloud redundant vault</div>
+                </div>
+                <input type="radio" name="quotaOption" value="10" {% if stats.quota_gb == 10 %}checked{% endif %} style="accent-color: #2563eb;">
+            </label>
+
+            <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer;">
+                <div>
+                    <div style="font-weight: 700; font-size: 13px; color: #0f172a;">50 GB Enterprise Quota</div>
+                    <div style="font-size: 11px; color: #64748b;">Glacier deep archive enabled</div>
+                </div>
+                <input type="radio" name="quotaOption" value="50" {% if stats.quota_gb == 50 %}checked{% endif %} style="accent-color: #2563eb;">
+            </label>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+            <button onclick="closeModal('upgradeModal')" style="padding: 6px 14px; border: 1px solid #cbd5e1; background: #ffffff; border-radius: 6px; font-size: 12px; cursor: pointer;">Cancel</button>
+            <button onclick="saveQuotaUpgrade()" style="padding: 6px 18px; background: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">Confirm Upgrade</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    function openEditProfileModal() { openModal('editProfileModal'); }
+    function openChangePasswordModal() { openModal('changePasswordModal'); }
+    function openUpgradeModal() { openModal('upgradeModal'); }
+
+    function saveProfile() {
+        const name = document.getElementById('editNameInput').value.trim();
+        const email = document.getElementById('editEmailInput').value.trim();
+        if (!name || !email) {
+            showToast("Name and email are required.", "danger");
+            return;
+        }
+
+        fetch('/api/user/profile', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name: name, email: email})
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('displayUserName').textContent = data.name;
+                document.getElementById('displayUserEmail').textContent = data.email;
+                document.getElementById('sidebarUserName').textContent = data.name;
+                document.getElementById('sidebarUserEmail').textContent = data.email;
+                closeModal('editProfileModal');
+                showToast("Profile successfully updated!", "success");
+            } else {
+                showToast(data.message, "danger");
+            }
+        });
+    }
+
+    function savePassword() {
+        const newPassword = document.getElementById('newPasswordInput').value.trim();
+        if (newPassword.length < 4) {
+            showToast("Password must be at least 4 characters.", "danger");
+            return;
+        }
+
+        fetch('/api/user/password', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({new_password: newPassword})
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                closeModal('changePasswordModal');
+                showToast("Password updated successfully!", "success");
+            } else {
+                showToast(data.message, "danger");
+            }
+        });
+    }
+
+    function saveNotifications() {
+        const emailNotif = document.getElementById('notifEmail').checked;
+        const reminderNotif = document.getElementById('notifReminder').checked;
+
+        fetch('/api/settings/notifications', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email_notifications: emailNotif,
+                daily_reminder: reminderNotif
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            showToast("Notification preferences updated.", "success");
+        });
+    }
+
+    function saveQuotaUpgrade() {
+        const selected = document.querySelector('input[name="quotaOption"]:checked').value;
+        fetch('/api/settings/quota', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({quota_gb: selected})
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                closeModal('upgradeModal');
+                showToast(data.message, "success");
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        });
+    }
+
+    function runLatencyPing() {
+        showToast("Testing cloud gateway latency...", "info");
+        const pingBox = document.getElementById('pingResults');
+        const pingList = document.getElementById('pingList');
+        pingBox.style.display = 'block';
+        pingList.innerHTML = '<span style="color: #64748b;">Pinging AWS S3, Google Cloud, Azure Blob, and Local Vault...</span>';
+
+        fetch('/api/test-connection', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            pingList.innerHTML = '';
+            data.endpoints.forEach(ep => {
+                const item = document.createElement('div');
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.padding = '4px 0';
+                item.innerHTML = `<strong>${ep.provider}</strong> <span style="color:#10b981; font-weight:600;">● ${ep.status} (${ep.latency})</span>`;
+                pingList.appendChild(item);
+            });
+            showToast("Diagnostics complete: All gateways operational.", "success");
+        });
+    }
+
+    function resetDemoData() {
+        if (confirm("Reset database to the initial 6 UI Prototype records?")) {
+            fetch('/api/reset-demo', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                showToast(data.message, "success");
+                setTimeout(() => window.location.href = '/dashboard', 1000);
+            });
+        }
+    }
+</script>
+{% endblock %}

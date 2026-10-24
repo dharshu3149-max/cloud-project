@@ -1,0 +1,24 @@
+# ==============================================================================
+# Render Infrastructure Blueprint - Cloud Backup Tracker Web Service
+# ==============================================================================
+services:
+  - type: web
+    name: cloud-backup-tracker
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_DEBUG
+        value: "False"
+      - key: MAX_CONTENT_LENGTH_MB
+        value: "50"
+      - key: DEMO_USER_NAME
+        value: "Dharshini"
+      - key: DEMO_USER_EMAIL
+        value: "dharshini@gmail.com"
+      - key: DEMO_USER_PASSWORD
+        value: "password123"

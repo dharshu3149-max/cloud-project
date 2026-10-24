@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cloud Backup Tracker - UI Prototype Presentation Board</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 2560px;
+    height: 1440px;
+    margin: 0;
+    padding: 28px 40px;
+    background: #f1f5f9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* Top Board Header */
+  .board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+    padding: 0 4px;
+  }
+  .board-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .board-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0a192f;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: -0.5px;
+  }
+  .board-title svg {
+    color: #2563eb;
+    filter: drop-shadow(0 2px 8px rgba(37,99,235,0.25));
+  }
+  .badge-tag {
+    background: #e0f2fe;
+    color: #0284c7;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 999px;
+    letter-spacing: 0.2px;
+  }
+  .board-header-right {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .board-header-right span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .indicator-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+  }
+
+  /* 3x2 Grid */
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 630px);
+    gap: 26px 30px;
+  }
+
+  .screen-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .screen-card {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+    display: flex;
+    position: relative;
+  }
+
+  .screen-label {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 10px;
+    letter-spacing: -0.2px;
+  }
+
+  /* Sidebar Component for screens 2-6 */
+  .sidebar {
+    width: 178px;
+    background: #0d1e38;
+    color: #94a3b8;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 14px;
+    flex-shrink: 0;
+    border-right: 1px solid #1e293b;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 16px;
+    letter-spacing: -0.2px;
+  }
+  .brand svg {
+    color: #38bdf8;
+  }
+  .nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #94a3b8;
+    cursor: default;
+  }
+  .nav-item.active {
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.4);
+  }
+  .nav-item svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+  .sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+  .user-meta {
+    overflow: hidden;
+  }
+  .user-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #f8fafc;
+    line-height: 1.2;
+  }
+  .user-email {
+    font-size: 9.5px;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Main viewport */
+  .viewport {
+    flex: 1;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .topbar {
+    height: 52px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .topbar-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.3px;
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    position: relative;
+  }
+  .icon-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    background: #ef4444;
+    border-radius: 50%;
+  }
+  .logout-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .view-body {
+    flex: 1;
+    padding: 16px 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* SCREEN 1: AUTH STYLES */
+  .auth-left {
+    flex: 1;
+    background: linear-gradient(150deg, #e0f2fe 0%, #f0f7ff 50%, #e0e7ff 100%);
+    padding: 34px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-right: 1px solid #e2e8f0;
+    position: relative;
+  }
+  .auth-logo-box {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 12px 24px rgba(37,99,235,0.3);
+    margin-bottom: 16px;
+  }
+  .auth-brand-name {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .auth-tagline {
+    font-size: 13px;
+    color: #475569;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .auth-pills {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2563eb;
+    background: rgba(255,255,255,0.85);
+    padding: 5px 16px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 24px;
+  }
+  .auth-cloud-card {
+    width: 220px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .auth-cloud-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .floating-badge {
+    background: #f1f5f9;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 9.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .auth-right {
+    flex: 1.15;
+    background: #ffffff;
+    padding: 36px 38px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .auth-tabs {
+    display: flex;
+    border-bottom: 2px solid #f1f5f9;
+    margin-bottom: 22px;
+  }
+  .auth-tab {
+    flex: 1;
+    text-align: center;
+    padding-bottom: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: default;
+  }
+  .auth-tab.active {
+    color: #2563eb;
+    border-bottom: 2px solid #2563eb;
+    margin-bottom: -2px;
+  }
+  .form-group {
+    margin-bottom: 14px;
+  }
+  .form-label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 5px;
+  }
+  .input-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-icon-wrap svg {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+    width: 15px;
+    height: 15px;
+  }
+  .input-icon-wrap .eye-icon {
+    left: auto;
+    right: 12px;
+    cursor: default;
+  }
+  .form-input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    font-size: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #f8fafc;
+    color: #0f172a;
+    font-weight: 500;
+  }
+  .auth-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    margin-bottom: 18px;
+    color: #64748b;
+  }
+  .auth-options a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .btn-primary {
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 11px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    cursor: default;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+  }
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 14px 0;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .auth-divider span {
+    padding: 0 10px;
+  }
+  .btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    padding: 9px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  }
+  .auth-switch {
+    text-align: center;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 16px;
+  }
+  .auth-switch a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* SCREEN 2: DASHBOARD */
+  .welcome-banner {
+    background: linear-gradient(90deg, #eff6ff 0%, #ffffff 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .welcome-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e3a8a;
+  }
+  .welcome-sub {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  }
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .stat-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stat-value {
+    font-size: 19px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+  }
+  .stat-sub {
+    font-size: 9.5px;
+    color: #94a3b8;
+  }
+  .progress-bar-wrap {
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 3px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: #10b981;
+    border-radius: 999px;
+  }
+
+  .table-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+  .table-header {
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .table-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  .table-link {
+    font-size: 11px;
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  .data-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    text-align: left;
+    padding: 8px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .data-table td {
+    padding: 8.5px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+  }
+  .file-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .badge-success {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #ecfdf5;
+    color: #059669;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .badge-success::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    background: #10b981;
+    border-radius: 50%;
+  }
+
+  /* SCREEN 3: UPLOAD BACKUP */
+  .dropzone {
+    border: 2px dashed #93c5fd;
+    background: #f0f7ff;
+    border-radius: 12px;
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+  }
+  .dropzone-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #dbeafe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2563eb;
+    margin-bottom: 2px;
+  }
+  .dropzone-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e3a8a;
+  }
+  .btn-choose {
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 7px 18px;
+    border-radius: 6px;
+    border: none;
+    box-shadow: 0 3px 8px rgba(37,99,235,0.3);
+  }
+  .dropzone-hint {
+    font-size: 10px;
+    color: #64748b;
+  }
+  .upload-target-row {
+    display: flex;
+    gap: 10px;
+  }
+  .target-pill {
+    flex: 1;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #334155;
+  }
+  .upload-prog-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+  .upload-prog-title {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .upload-prog-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .prog-bar-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .prog-track {
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .prog-fill {
+    height: 100%;
+    background: #2563eb;
+    border-radius: 999px;
+    width: 70%;
+  }
+  .prog-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #64748b;
+  }
+
+  /* SCREEN 4: MY FILES */
+  .files-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 260px;
+  }
+  .search-box svg {
+    position: absolute;
+    left: 10px;
+    width: 13px;
+    height: 13px;
+    color: #94a3b8;
+  }
+  .search-input {
+    width: 100%;
+    padding: 7px 10px 7px 32px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    font-size: 11px;
+    background: #ffffff;
+    color: #0f172a;
+  }
+  .btn-upload-sm {
+    background: #2563eb;
+    color: #ffffff;
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 6px rgba(37,99,235,0.25);
+  }
+  .btn-action-icon {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    color: #475569;
+    cursor: default;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 3px;
+  }
+
+  /* SCREEN 5: RESTORE */
+  .btn-restore {
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 10.5px;
+    font-weight: 600;
+    cursor: default;
+    box-shadow: 0 2px 6px rgba(37,99,235,0.2);
+  }
+
+  /* SCREEN 6: SETTINGS */
+  .settings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .setting-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 11px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+  .setting-header {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #f8fafc;
+    font-size: 11px;
+  }
+  .setting-row:last-child {
+    border-bottom: none;
+  }
+  .setting-label {
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .setting-val {
+    font-weight: 600;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .toggle-switch {
+    width: 34px;
+    height: 19px;
+    background: #2563eb;
+    border-radius: 999px;
+    position: relative;
+  }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2.5px;
+    right: 2.5px;
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    border-radius: 50%;
+  }
+
+  /* File Type Icons */
+  .file-icon-pdf { color: #ef4444; }
+  .file-icon-txt { color: #3b82f6; }
+  .file-icon-zip { color: #f59e0b; }
+  .file-icon-ppt { color: #ea580c; }
+  .file-icon-img { color: #8b5cf6; }
+</style>
+</head>
+<body>
+
+  <!-- Top Board Header -->
+  <div class="board-header">
+    <div class="board-header-left">
+      <div class="board-title">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+          <polyline points="12 13 12 9 10 11"/>
+        </svg>
+        Cloud Backup Tracker
+      </div>
+      <div class="badge-tag">SaaS UI Prototype</div>
+    </div>
+    <div class="board-header-right">
+      <span><div class="indicator-dot"></div> Live Demo Prototype</span>
+      <span>Third-Year Computer Science Mini Project Expo • 3×2 System Workflow</span>
+    </div>
+  </div>
+
+  <!-- 3x2 Grid Container -->
+  <div class="grid-container">
+
+    <!-- SCREEN 1: LOGIN / SIGN UP -->
+    <div class="screen-wrapper">
+      <div class="screen-card">
+        <!-- Auth Left Side -->
+        <div class="auth-left">
+          <div class="auth-logo-box">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+              <polyline points="12 11 12 15 10 13"/>
+              <polyline points="12 11 14 13"/>
+            </svg>
+          </div>
+          <div class="auth-brand-name">Cloud Backup Tracker</div>
+          <div class="auth-tagline">Your files. Safe in the cloud.</div>
+          <div class="auth-pills">Track • Backup • Restore</div>
+
+          <!-- Mini Graphic -->
+          <div class="auth-cloud-card">
+            <div class="auth-cloud-preview">
+              <span class="floating-badge" style="color: #ef4444;"><span style="color: #ef4444;">●</span> PDF</span>
+              <span class="floating-badge" style="color: #f59e0b;"><span style="color: #f59e0b;">●</span> ZIP</span>
+              <span class="floating-badge" style="color: #3b82f6;"><span style="color: #3b82f6;">●</span> SQL</span>
+            </div>
+            <div style="font-size: 11px; font-weight: 700; color: #1e3a8a; margin-top: 4px;">SHA-256 Vault Encryption</div>
+            <div style="font-size: 9.5px; color: #10b981; font-weight: 600;">● Continuous Auto-Sync Ready</div>
+          </div>
+        </div>
+
+        <!-- Auth Right Side -->
+        <div class="auth-right">
+          <div class="auth-tabs">
+            <div class="auth-tab active">Login</div>
+            <div class="auth-tab">Sign Up</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email address</label>
+            <div class="input-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <input type="text" class="form-input" value="dharshini@gmail.com" readonly>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" class="form-input" value="••••••••••••" readonly>
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+          </div>
+
+          <div class="auth-options">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: default;">
+              <input type="checkbox" checked style="accent-color: #2563eb;"> Remember me
+            </label>
+            <a href="#">Forgot password?</a>
+          </div>
+
+          <button class="btn-primary">Login</button>
+
+          <div class="auth-divider"><span>OR</span></div>
+
+          <div class="btn-google">
+            <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5.1 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3 0-.8.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.1c0 2.8.7 5.4 1.9 7.8l3.7-2.9z"/><path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"/></svg>
+            Continue with Google
+          </div>
+
+          <div class="auth-switch">Don't have an account? <a href="#">Sign Up</a></div>
+        </div>
+      </div>
+      <div class="screen-label">1. Login / Sign Up Page</div>
+    </div>
+
+
+    <!-- SCREEN 2: DASHBOARD -->
+    <div class="screen-wrapper">
+      <div class="screen-card">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="brand">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <span>Cloud Backup</span>
+          </div>
+          <ul class="nav-list">
+            <li class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Dashboard</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              <span>Upload Backup</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+              <span>My Files</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+              <span>Restore</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </li>
+          </ul>
+          <div class="sidebar-user">
+            <div class="user-avatar">D</div>
+            <div class="user-meta">
+              <div class="user-name">Dharshini</div>
+              <div class="user-email">dharshini@gmail.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Viewport -->
+        <div class="viewport">
+          <div class="topbar">
+            <div class="topbar-left">
+              <span class="topbar-title">Dashboard</span>
+            </div>
+            <div class="topbar-right">
+              <div class="icon-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                <div class="icon-badge"></div>
+              </div>
+              <button class="logout-btn">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                Logout
+              </button>
+            </div>
+          </div>
+
+          <div class="view-body">
+            <!-- Welcome -->
+            <div class="welcome-banner">
+              <div>
+                <div class="welcome-title">Hello, Dharshini! 👋</div>
+                <div class="welcome-sub">Here's your real-time cloud backup summary</div>
+              </div>
+              <div style="font-size: 11px; background: #ffffff; padding: 4px 10px; border-radius: 6px; border: 1px solid #bfdbfe; color: #1e40af; font-weight: 600;">
+                ● Auto-Sync Active
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stat-grid">
+              <div class="stat-card">
+                <div class="stat-header">
+                  <span class="stat-label">Total Backups</span>
+                  <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                  </div>
+                </div>
+                <div class="stat-value">5</div>
+                <div class="stat-sub">+2 files this week</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-header">
+                  <span class="stat-label">Total Size</span>
+                  <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+                  </div>
+                </div>
+                <div class="stat-value">248 MB</div>
+                <div class="stat-sub">Across 5 documents</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-header">
+                  <span class="stat-label">Last Backup</span>
+                  <div class="stat-icon" style="background: #f3e8ff; color: #9333ea;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                  </div>
+                </div>
+                <div class="stat-value" style="font-size: 15px; margin-top: 3px;">Oct 25, 2025</div>
+                <div class="stat-sub">(2 days ago)</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-header">
+                  <span class="stat-label">Storage Used</span>
+                  <div class="stat-icon" style="background: #ccfbf1; color: #0d9488;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                  </div>
+                </div>
+                <div class="stat-value">12%</div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" style="width: 12%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-card">
+              <div class="table-header">
+                <span class="table-title">Recent Backups</span>
+                <a href="#" class="table-link">View All</a>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Backup Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-pdf" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Project_Report.pdf
+                      </div>
+                    </td>
+                    <td>PDF</td>
+                    <td>2.4 MB</td>
+                    <td>Oct 25, 2025 10:32 AM</td>
+                    <td><span class="badge-success">Backed up</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-txt" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Notes.txt
+                      </div>
+                    </td>
+                    <td>Text</td>
+                    <td>12 KB</td>
+                    <td>Oct 24, 2025 06:18 PM</td>
+                    <td><span class="badge-success">Backed up</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-zip" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Images.zip
+                      </div>
+                    </td>
+                    <td>Zip</td>
+                    <td>5.8 MB</td>
+                    <td>Oct 23, 2025 11:45 AM</td>
+                    <td><span class="badge-success">Backed up</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-ppt" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Presentation.pptx
+                      </div>
+                    </td>
+                    <td>PPT</td>
+                    <td>3.2 MB</td>
+                    <td>Oct 22, 2025 04:20 PM</td>
+                    <td><span class="badge-success">Backed up</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">2. Dashboard</div>
+    </div>
+
+
+    <!-- SCREEN 3: UPLOAD BACKUP -->
+    <div class="screen-wrapper">
+      <div class="screen-card">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="brand">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <span>Cloud Backup</span>
+          </div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Dashboard</span>
+            </li>
+            <li class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              <span>Upload Backup</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+              <span>My Files</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+              <span>Restore</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </li>
+          </ul>
+          <div class="sidebar-user">
+            <div class="user-avatar">D</div>
+            <div class="user-meta">
+              <div class="user-name">Dharshini</div>
+              <div class="user-email">dharshini@gmail.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Viewport -->
+        <div class="viewport">
+          <div class="topbar">
+            <div class="topbar-left">
+              <span class="topbar-title">Upload Backup</span>
+            </div>
+            <div class="topbar-right">
+              <div class="icon-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="view-body">
+            <div>
+              <div style="font-size: 13.5px; font-weight: 700; color: #0f172a;">Upload Files to Cloud Vault</div>
+              <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Select files or folders to safely encrypt and back up to the cloud</div>
+            </div>
+
+            <!-- Drag and drop zone -->
+            <div class="dropzone">
+              <div class="dropzone-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 11 12 15 10 13"/><polyline points="12 11 14 13"/></svg>
+              </div>
+              <div class="dropzone-text">Drag & drop files here</div>
+              <div style="font-size: 11px; color: #94a3b8;">or</div>
+              <button class="btn-choose">Choose Files</button>
+              <div class="dropzone-hint">Supported formats: Documents, Images, Databases, Zip (Up to 500 MB)</div>
+            </div>
+
+            <!-- Target selection pills -->
+            <div class="upload-target-row">
+              <div class="target-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                <span>Encryption: AES-256 Bit</span>
+              </div>
+              <div class="target-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Integrity: SHA-256 Checksum</span>
+              </div>
+            </div>
+
+            <!-- Progress section -->
+            <div class="upload-prog-card">
+              <div class="upload-prog-title">
+                <span>Upload Progress</span>
+                <span style="font-size: 10px; color: #10b981; font-weight: 600;">● Syncing to Vault...</span>
+              </div>
+              <div class="upload-prog-row">
+                <svg class="file-icon-pdf" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                <div class="prog-bar-container">
+                  <div class="prog-meta">
+                    <span style="font-weight: 600; color: #0f172a;">Project_Report.pdf</span>
+                    <span style="font-weight: 700; color: #2563eb;">70%</span>
+                  </div>
+                  <div class="prog-track">
+                    <div class="prog-fill"></div>
+                  </div>
+                  <div class="prog-meta">
+                    <span>1.68 MB of 2.4 MB (1.4 MB/s)</span>
+                    <span style="color: #64748b;">4 seconds remaining</span>
+                  </div>
+                </div>
+                <div style="cursor: default; color: #94a3b8; font-size: 14px; font-weight: 700;">✕</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">3. Upload Backup</div>
+    </div>
+
+
+    <!-- SCREEN 4: MY FILES -->
+    <div class="screen-wrapper">
+      <div class="screen-card">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="brand">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <span>Cloud Backup</span>
+          </div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Dashboard</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              <span>Upload Backup</span>
+            </li>
+            <li class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+              <span>My Files</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+              <span>Restore</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </li>
+          </ul>
+          <div class="sidebar-user">
+            <div class="user-avatar">D</div>
+            <div class="user-meta">
+              <div class="user-name">Dharshini</div>
+              <div class="user-email">dharshini@gmail.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Viewport -->
+        <div class="viewport">
+          <div class="topbar">
+            <div class="topbar-left">
+              <span class="topbar-title">My Files</span>
+            </div>
+            <div class="topbar-right">
+              <div class="icon-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="view-body">
+            <div class="files-toolbar">
+              <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" class="search-input" placeholder="Search files...">
+              </div>
+              <button class="btn-upload-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Upload
+              </button>
+            </div>
+
+            <!-- Table -->
+            <div class="table-card">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Backup Date</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-pdf" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Project_Report.pdf
+                      </div>
+                    </td>
+                    <td>PDF</td>
+                    <td>2.4 MB</td>
+                    <td>Oct 25, 2025 10:32 AM</td>
+                    <td style="text-align: right;">
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-txt" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Notes.txt
+                      </div>
+                    </td>
+                    <td>Text</td>
+                    <td>12 KB</td>
+                    <td>Oct 24, 2025 06:18 PM</td>
+                    <td style="text-align: right;">
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-zip" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Images.zip
+                      </div>
+                    </td>
+                    <td>Zip</td>
+                    <td>5.8 MB</td>
+                    <td>Oct 23, 2025 11:45 AM</td>
+                    <td style="text-align: right;">
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-ppt" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Presentation.pptx
+                      </div>
+                    </td>
+                    <td>PPT</td>
+                    <td>3.2 MB</td>
+                    <td>Oct 22, 2025 04:20 PM</td>
+                    <td style="text-align: right;">
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-img" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Screenshot.png
+                      </div>
+                    </td>
+                    <td>Image</td>
+                    <td>1.1 MB</td>
+                    <td>Oct 20, 2025 09:12 AM</td>
+                    <td style="text-align: right;">
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-img" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Design.png
+                      </div>
+                    </td>
+                    <td>Image</td>
+                    <td>850 KB</td>
+                    <td>Oct 18, 2025 07:45 PM</td>
+                    <td style="text-align: right;">
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                      <span class="btn-action-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">4. My Files</div>
+    </div>
+
+
+    <!-- SCREEN 5: RESTORE FILES -->
+    <div class="screen-wrapper">
+      <div class="screen-card">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="brand">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <span>Cloud Backup</span>
+          </div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Dashboard</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              <span>Upload Backup</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+              <span>My Files</span>
+            </li>
+            <li class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+              <span>Restore</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </li>
+          </ul>
+          <div class="sidebar-user">
+            <div class="user-avatar">D</div>
+            <div class="user-meta">
+              <div class="user-name">Dharshini</div>
+              <div class="user-email">dharshini@gmail.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Viewport -->
+        <div class="viewport">
+          <div class="topbar">
+            <div class="topbar-left">
+              <span class="topbar-title">Restore Files</span>
+            </div>
+            <div class="topbar-right">
+              <div class="icon-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="view-body">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+              <div>
+                <div style="font-size: 13.5px; font-weight: 700; color: #0f172a;">Restore Backed-Up Data</div>
+                <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Choose a file or version to restore directly from your cloud vault</div>
+              </div>
+              <div style="font-size: 10.5px; color: #2563eb; font-weight: 600; background: #eff6ff; padding: 4px 10px; border-radius: 6px; border: 1px solid #bfdbfe;">
+                Point-in-Time Recovery
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-card">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Backup Date</th>
+                    <th style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-pdf" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Project_Report.pdf
+                      </div>
+                    </td>
+                    <td>PDF</td>
+                    <td>2.4 MB</td>
+                    <td>Oct 25, 2025</td>
+                    <td style="text-align: right;"><button class="btn-restore">Restore</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-txt" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Notes.txt
+                      </div>
+                    </td>
+                    <td>Text</td>
+                    <td>12 KB</td>
+                    <td>Oct 24, 2025</td>
+                    <td style="text-align: right;"><button class="btn-restore">Restore</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-zip" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Images.zip
+                      </div>
+                    </td>
+                    <td>Zip</td>
+                    <td>5.8 MB</td>
+                    <td>Oct 23, 2025</td>
+                    <td style="text-align: right;"><button class="btn-restore">Restore</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-ppt" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Presentation.pptx
+                      </div>
+                    </td>
+                    <td>PPT</td>
+                    <td>3.2 MB</td>
+                    <td>Oct 22, 2025</td>
+                    <td style="text-align: right;"><button class="btn-restore">Restore</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-img" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Screenshot.png
+                      </div>
+                    </td>
+                    <td>Image</td>
+                    <td>1.1 MB</td>
+                    <td>Oct 20, 2025</td>
+                    <td style="text-align: right;"><button class="btn-restore">Restore</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="file-name-cell">
+                        <svg class="file-icon-img" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        Design.png
+                      </div>
+                    </td>
+                    <td>Image</td>
+                    <td>850 KB</td>
+                    <td>Oct 18, 2025</td>
+                    <td style="text-align: right;"><button class="btn-restore">Restore</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">5. Restore Files</div>
+    </div>
+
+
+    <!-- SCREEN 6: SETTINGS -->
+    <div class="screen-wrapper">
+      <div class="screen-card">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="brand">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <span>Cloud Backup</span>
+          </div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Dashboard</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              <span>Upload Backup</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+              <span>My Files</span>
+            </li>
+            <li class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+              <span>Restore</span>
+            </li>
+            <li class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </li>
+          </ul>
+          <div class="sidebar-user">
+            <div class="user-avatar">D</div>
+            <div class="user-meta">
+              <div class="user-name">Dharshini</div>
+              <div class="user-email">dharshini@gmail.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Viewport -->
+        <div class="viewport">
+          <div class="topbar">
+            <div class="topbar-left">
+              <span class="topbar-title">Settings</span>
+            </div>
+            <div class="topbar-right">
+              <div class="icon-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="view-body">
+            <div class="settings-grid">
+
+              <!-- Account -->
+              <div class="setting-box">
+                <div class="setting-header">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  Account Profile
+                </div>
+                <div class="setting-row">
+                  <div class="setting-label">
+                    Name
+                  </div>
+                  <div class="setting-val">
+                    <span>Dharshini</span>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                  </div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-label">
+                    Email
+                  </div>
+                  <div class="setting-val">
+                    <span>dharshini@gmail.com</span>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                  </div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-label">
+                    Password
+                  </div>
+                  <div class="setting-val" style="color: #2563eb; font-size: 11px; cursor: default;">
+                    Change Password ›
+                  </div>
+                </div>
+              </div>
+
+              <!-- Storage -->
+              <div class="setting-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span class="setting-header" style="margin-bottom: 0;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                    Cloud Storage
+                  </span>
+                  <button style="background: #2563eb; color: #ffffff; border: none; padding: 4px 12px; border-radius: 6px; font-size: 10px; font-weight: 600;">Upgrade Plan</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                  <span style="color: #64748b;">Used Storage</span>
+                  <span style="font-weight: 700; color: #0f172a;">248 MB / 2 GB (12%)</span>
+                </div>
+                <div class="prog-track" style="height: 6px;">
+                  <div class="prog-fill" style="width: 12%; background: #10b981;"></div>
+                </div>
+              </div>
+
+              <!-- Preferences -->
+              <div class="setting-box">
+                <div class="setting-header">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                  Notification Preferences
+                </div>
+                <div class="setting-row">
+                  <span style="color: #475569;">Email notifications</span>
+                  <div class="toggle-switch"></div>
+                </div>
+                <div class="setting-row">
+                  <span style="color: #475569;">Backup reminder (daily)</span>
+                  <div class="toggle-switch"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">6. Settings</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

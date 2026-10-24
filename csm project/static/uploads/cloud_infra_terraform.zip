@@ -1,0 +1,10 @@
+Cloud Backup Tracker Local Vault
+File: cloud_infra_terraform.zip
+Provider: Azure Blob
+Upload Timestamp: 2026-10-22 16:05:40
+Checksum: 2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae
+Notes: Infrastructure as Code configurations for AWS & Azure microservices
+
+============================================================
+This is an authenticated backup copy stored in the Cloud Backup Vault.
+Project: College CSM Cloud Backup Tracker System.

@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2 class="card-title">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Backup History & Inventory
+                <span class="badge badge-info" style="font-size: 0.8rem; margin-left: 0.5rem;" id="totalBackupsBadge">
+                    {{ backups|length }} Backups
+                </span>
+            </h2>
+            <div class="card-subtitle">Comprehensive ledger of all stored backups, integrity checksums, and replication statuses</div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <a href="{{ url_for('export_csv') }}" class="btn btn-secondary btn-sm" title="Download CSV report">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Export CSV
+            </a>
+            <a href="{{ url_for('upload_page') }}" class="btn btn-primary btn-sm">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                Upload File
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Interactive Search & Filter Toolbar -->
+        <div class="filter-toolbar">
+            <div class="search-input-box">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" id="historySearchInput" placeholder="Search by file name, checksum, or notes..." value="{{ search_query }}">
+            </div>
+
+            <div class="filter-actions">
+                <!-- Status Filter -->
+                <select id="statusFilterSelect" class="select-filter" aria-label="Filter by Status">
+                    <option value="All" {% if status_filter == 'All' %}selected{% endif %}>All Statuses</option>
+                    <option value="Success" {% if status_filter == 'Success' %}selected{% endif %}>Success Only</option>
+                    <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending Sync</option>
+                    <option value="Failed" {% if status_filter == 'Failed' %}selected{% endif %}>Failed</option>
+                </select>
+
+                <!-- Cloud Provider Filter -->
+                <select id="providerFilterSelect" class="select-filter" aria-label="Filter by Cloud Provider">
+                    <option value="All" {% if provider_filter == 'All' %}selected{% endif %}>All Cloud Providers</option>
+                    <option value="AWS S3" {% if provider_filter == 'AWS S3' %}selected{% endif %}>AWS S3</option>
+                    <option value="Google Cloud" {% if provider_filter == 'Google Cloud' %}selected{% endif %}>Google Cloud</option>
+                    <option value="Azure Blob" {% if provider_filter == 'Azure Blob' %}selected{% endif %}>Azure Blob</option>
+                    <option value="Local Cloud Vault" {% if provider_filter == 'Local Cloud Vault' %}selected{% endif %}>Local Cloud Vault</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- History Table -->
+        <div class="table-responsive">
+            <table class="custom-table" id="historyTable">
+                <thead>
+                    <tr>
+                        <th>File Name & Integrity Hash</th>
+                        <th>File Size</th>
+                        <th>Category</th>
+                        <th>Cloud Target & Tier</th>
+                        <th>Replication Status</th>
+                        <th>Upload Timestamp</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    {% for b in backups %}
+                    <tr data-backup-row-id="{{ b.id }}" 
+                        data-filename="{{ b.original_name }}" 
+                        data-status="{{ b.status }}" 
+                        data-provider="{{ b.cloud_provider }}" 
+                        data-checksum="{{ b.checksum }}"
+                        data-category="{{ b.file_type }}"
+                        data-notes="{{ b.notes|default('', true) }}">
+                        <td>
+                            <div class="file-cell">
+                                <div class="file-icon-box">
+                                    {% if b.file_type == 'Documents' %}
+                                        <svg width="18" height="18" fill="none" stroke="#2563eb" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    {% elif b.file_type == 'Databases' %}
+                                        <svg width="18" height="18" fill="none" stroke="#9333ea" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path stroke-linecap="round" stroke-width="2" d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                                    {% elif b.file_type == 'Archives' %}
+                                        <svg width="18" height="18" fill="none" stroke="#d97706" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8" stroke-width="2"/><rect x="1" y="3" width="22" height="5" stroke-width="2"/><line x1="10" y1="12" x2="14" y2="12" stroke-width="2"/></svg>
+                                    {% elif b.file_type == 'Images' %}
+                                        <svg width="18" height="18" fill="none" stroke="#059669" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21" stroke-width="2"/></svg>
+                                    {% else %}
+                                        <svg width="18" height="18" fill="none" stroke="#475569" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="file-meta-name" title="{{ b.original_name }}">{{ b.original_name }}</div>
+                                    <div class="file-meta-checksum" title="Full SHA-256: {{ b.checksum }}">
+                                        SHA-256: {{ b.checksum[:14] }}...
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-weight: 500;">{{ b.file_size_formatted }}</td>
+                        <td>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">
+                                {{ b.file_type }}
+                            </span>
+                        </td>
+                        <td>
+                            <div>
+                                <span class="badge-provider">{{ b.cloud_provider }}</span>
+                                <span style="font-size: 0.72rem; color: var(--text-dim); display: block; margin-top: 2px;">Tier: {{ b.storage_tier }}</span>
+                            </div>
+                        </td>
+                        <td class="status-badge-container">
+                            {% if b.status == 'Success' %}
+                                <span class="badge badge-success">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Success
+                                </span>
+                            {% elif b.status == 'Pending' %}
+                                <span class="badge badge-warning">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" stroke-width="3"/>
+                                        <polyline points="12 6 12 12 14 14" stroke-width="3"/>
+                                    </svg>
+                                    Pending
+                                </span>
+                            {% else %}
+                                <span class="badge badge-danger">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <line x1="18" y1="6" x2="6" y2="18" stroke-width="3"/>
+                                        <line x1="6" y1="6" x2="18" y2="18" stroke-width="3"/>
+                                    </svg>
+                                    Failed
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td style="color: var(--text-muted); font-size: 0.8rem;">
+                            {{ b.upload_time }}
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="action-btn-group" style="justify-content: flex-end;">
+                                <!-- View Details -->
+                                <button class="btn btn-secondary btn-icon-only btn-sm" data-view-id="{{ b.id }}" title="View Full Details">
+                                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </button>
+
+                                <!-- Sync / Re-try (Only for pending/failed or manual sync) -->
+                                <button class="btn btn-secondary btn-icon-only btn-sm" data-sync-id="{{ b.id }}" title="Re-sync / Retry Backup">
+                                    <svg width="15" height="15" fill="none" stroke="#2563eb" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                </button>
+
+                                <!-- Download -->
+                                <a href="{{ url_for('download_file', backup_id=b.id) }}" class="btn btn-secondary btn-icon-only btn-sm" title="Download File">
+                                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                </a>
+
+                                <!-- Delete -->
+                                <button class="btn btn-danger btn-icon-only btn-sm" data-delete-id="{{ b.id }}" data-name="{{ b.original_name }}" title="Delete Backup Record">
+                                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <polyline points="3 6 5 6 21 6" stroke-width="2"/>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke-width="2"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
